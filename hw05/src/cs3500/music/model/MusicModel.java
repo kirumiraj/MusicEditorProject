@@ -17,7 +17,6 @@ public class MusicModel implements IMusicModel {
    * it will only add the first one.
    *
    * @param pitches list of pitches to add to the MusicModel
-   *
    * @throws IllegalArgumentException if a pitch has invalid pitch, octave, or notes
    */
   public MusicModel(List<Pitch> pitches, int tempo) {
@@ -66,9 +65,7 @@ public class MusicModel implements IMusicModel {
    * Takes a Pitch object, returns a corresponding Pitch object from this MusicModel.
    *
    * @param p a Pitch object for the desired Pitch in the MusicModel
-   *
    * @return a Pitch object matching the given Pitch
-   *
    * @throws IllegalArgumentException if the MusicModel does not contain the given Pitch
    */
   public Pitch getPitch(Pitch p) {
@@ -115,8 +112,7 @@ public class MusicModel implements IMusicModel {
   public void addNotes(Pitch p, List<Integer> notes) {
     if (this.pitches.contains(p)) {
       this.getPitch(p).addNotes(notes);
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("MusicModel does not contain this pitch.");
     }
   }
@@ -125,8 +121,7 @@ public class MusicModel implements IMusicModel {
   public void addPitch(Pitch p) {
     if (this.pitches.contains(p)) {
       throw new IllegalArgumentException("MusicModel already contains this Pitch.");
-    }
-    else {
+    } else {
       this.pitches.add(p);
     }
   }
@@ -149,8 +144,7 @@ public class MusicModel implements IMusicModel {
       if (this.pitches.contains(p)) {
         this.removePitch(p);
         this.pitches.add(p);
-      }
-      else {
+      } else {
         this.pitches.add(p);
       }
     }
@@ -172,8 +166,7 @@ public class MusicModel implements IMusicModel {
       List<Integer> empty = new ArrayList<Integer>();
       if (this.pitches.contains(p)) {
         this.addNotes(p, p.getNotes());
-      }
-      else {
+      } else {
         for (int a = 0; a < max; a++) {
           empty.add(0);
         }
@@ -185,229 +178,18 @@ public class MusicModel implements IMusicModel {
   }
 
   /**
-   * Finds the lowest and highest pitches in the MusicModel so that they can be used to generate an
-   * ordered row of pitches and the octave.
-   *
-   * @return a list of Pitch objects
-   **/
-  private List<Pitch> findLowestAndHighestPitch() {
-    Pitch lowest = this.pitches.get(0);
-    Pitch highest = this.pitches.get(0);
-    for (Pitch temp : this.pitches) {
-      if (temp.getOctave() < lowest.getOctave() || (temp.getOctave() == lowest.getOctave()
-              && temp.getPitch() < lowest.getPitch())) {
-        lowest = temp;
-      }
-      if (temp.getOctave() > highest.getOctave() || (temp.getOctave() == highest.getOctave()
-              && temp.getPitch() > highest.getPitch())) {
-        highest = temp;
-      }
-    }
-    List<Pitch> l = new ArrayList<Pitch>();
-    l.add(lowest);
-    l.add(highest);
-    return l;
-  }
-
-  /**
    * Iterates through all the pitches and finds the longest one.
    *
    * @return the largest number of beats in any Pitch
    **/
   private int maxBeats() {
     int max = 0;
-    for (Pitch p: this.pitches) {
+    for (Pitch p : this.pitches) {
       if (p.getNotes().size() > max) {
         max = p.getNotes().size();
       }
     }
     return max;
-  }
-
-  /**
-   * Generates a full row of pitches and their octaves to be used by toString.
-   *
-   * @param lowestAndHighest a list with the two lowest and highest pitches
-   *
-   * @return a full list of Pitches with empty Pitch objects for the pitches MusicModel does not
-   *     contain
-   **/
-  private List<Pitch> generateOctaves(List<Pitch> lowestAndHighest) {
-    int startPitch = lowestAndHighest.get(0).getPitch();
-    int endPitch = lowestAndHighest.get(1).getPitch();
-    int startOctave = lowestAndHighest.get(0).getOctave();
-    int endOctave = lowestAndHighest.get(1).getOctave();
-    if (endOctave >= startOctave) {
-      List<Pitch> generatePitches = new ArrayList<Pitch>();
-      for (int i = startOctave; i < endOctave + 1; i++) {
-        for (int a = 1; a < 13; a++) {
-          Pitch p = new Pitch(a, i);
-          if (i == startOctave && i == endOctave) {
-            if (a >= startPitch && a <= endPitch) {
-              if (this.pitches.contains(p)) {
-                generatePitches.add(this.getPitch(a, i));
-              }
-              else {
-                generatePitches.add(p);
-              }
-            }
-          }
-          else if (i == startOctave) {
-            if (a >= startPitch) {
-              if (this.pitches.contains(p)) {
-                generatePitches.add(this.getPitch(a, i));
-              }
-              else {
-                generatePitches.add(p);
-              }
-            }
-          }
-          else if (i == endOctave) {
-            if (a <= endPitch) {
-              if (this.pitches.contains(p)) {
-                generatePitches.add(this.getPitch(a, i));
-              }
-              else {
-                generatePitches.add(p);
-              }
-            }
-          }
-          else {
-            if (this.pitches.contains(p)) {
-              generatePitches.add(this.getPitch(a, i));
-            }
-            else {
-              generatePitches.add(p);
-            }
-          }
-        }
-      }
-      return generatePitches;
-    }
-    else {
-      throw new IllegalArgumentException("Please put in a valid start and end");
-    }
-  }
-
-  /**
-   * Iterates through all the pitches and finds the longest one.
-   *
-   * @param p the integer of the pitch
-   *
-   * @return the largest number of beats in any Pitch
-   **/
-  private String pitchToString(int p) {
-    switch (p) {
-      case 1: return "C";
-      case 2: return "C#";
-      case 3: return "D";
-      case 4: return "D#";
-      case 5: return "E";
-      case 6: return "F";
-      case 7: return "F#";
-      case 8: return "G";
-      case 9: return "G#";
-      case 10: return "A";
-      case 11: return "A#";
-      case 12: return "B";
-      default: throw new IllegalArgumentException("Invalid pitch in pitchToString,"
-              + " this should not happen.");
-    }
-  }
-
-  /**
-   * Returns a string depending on which note is passed to it.
-   *
-   * @param getNote the integer of the note
-   *
-   * @return a string corresponding to the note value
-   *
-   * @throws IllegalArgumentException if the note is invalid
-   **/
-  private String generateNote(int getNote) {
-    switch (getNote) {
-      case 0:
-        return "     ";
-      case 1:
-        return "  |  ";
-      case 2:
-        return "  X  ";
-      default:
-        throw new IllegalArgumentException("Invalid note value, must be 0, 1, or 2.");
-    }
-  }
-
-  /**
-   * Pads a given integer depending on what the largest one is.
-   *
-   * @param beat the integer of the current beat
-   * @param max the largest beat
-   *
-   * @return a padded string with the current beat
-   *
-   * @throws IllegalArgumentException if the max beat is smaller than the current one
-   **/
-  private String padBeat(int beat, int max) {
-    if (max >= beat) {
-      return String.format("%" + String.valueOf(max).length() + "s", beat);
-    }
-    else {
-      throw new IllegalArgumentException("Current beat cannot be bigger than max");
-    }
-  }
-
-  /**
-   * Takes a list of pitches and turns them into a string with their corresponding note names.
-   *
-   * @param pitchList a list of all pitches to be turned into strings
-   *
-   * @return a string containing all pitches and their octaves
-   *
-   * @throws IllegalStateException if an octave is larger than 99, this is a view restriction
-   **/
-  private String generateOctaveText(List<Pitch> pitchList) {
-    String s = "";
-    for (int i = 0; i < pitchList.size(); i++) {
-      Pitch p = pitchList.get(i);
-      if (p.getOctave() > 99) {
-        throw new IllegalStateException("The MusicModel toString method does not support more"
-                + "than 100 octaves");
-      }
-      s += String.format("%" + 5 + "s", this.pitchToString(p.getPitch()) + p.getOctave());
-    }
-    return s;
-  }
-
-  /**
-   * Generates a row of notes at the given beat.
-   *
-   * @param pitchList a list of all pitches to be turned into strings
-   * @param beat the current beat
-   *
-   * @return a string of a row of notes at the given beat
-   **/
-  private String generateRow(List<Pitch> pitchList, int beat) {
-    String s = "";
-    for (int i = 0; i < pitchList.size(); i++) {
-      Pitch p = pitchList.get(i);
-      s += this.generateNote(p.getNote(beat));
-    }
-    return s;
-  }
-
-  @Override
-  public String toString() {
-    List<Pitch> lowestAndHighest = this.findLowestAndHighestPitch();
-    List<Pitch> lPitch = this.generateOctaves(lowestAndHighest);
-    int maxBeats = this.maxBeats();
-    String octaves = String.format("%" + String.valueOf(maxBeats).length() + "s",
-            this.generateOctaveText(lPitch));
-    String beats = "";
-    for (int i = 0; i < maxBeats - 1; i++) {
-      beats += this.padBeat(i, maxBeats) + this.generateRow(lPitch, i) + "\n";
-    }
-    beats += this.padBeat(maxBeats - 1, maxBeats) + this.generateRow(lPitch, maxBeats - 1);
-    return octaves + "\n" + beats;
   }
 
   /**
@@ -454,8 +236,8 @@ public class MusicModel implements IMusicModel {
      * @param start      The start time of the note, in beats
      * @param end        The end time of the note, in beats
      * @param instrument The instrument number (to be interpreted by MIDI)
-     * @param pitch      The pitch (in the range [0, 127], where 60 represents C4,
-     *                   the middle-C on a piano)
+     * @param pitch      The pitch (in the range [0, 127], where 60 represents C4, the middle-C on a
+     *                   piano)
      * @param volume     The volume (in the range [0, 127])
      */
     @Override
@@ -465,13 +247,12 @@ public class MusicModel implements IMusicModel {
       Pitch checkPitch = new Pitch(realPitch, realOctave);
       int duration = end - start - 1;
       if (this.notes.contains(checkPitch)) {
-        for (Pitch p: this.notes) {
+        for (Pitch p : this.notes) {
           if (p.equals(checkPitch)) {
             p.addNote(start, duration);
           }
         }
-      }
-      else {
+      } else {
         checkPitch.addNote(start, duration);
         this.notes.add(checkPitch);
       }
